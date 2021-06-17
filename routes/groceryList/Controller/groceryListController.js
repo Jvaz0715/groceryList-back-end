@@ -9,7 +9,7 @@ async function getAllGroceries(req, res) {
     } catch(e) {
         res.status(500).json({ message: e.message, error: e }); 
     }
-}
+};
 
 async function createGrocery(req, res) {
     try{
@@ -25,7 +25,7 @@ async function createGrocery(req, res) {
     } catch (e) {
         res.status(500).json({ message: e.message, error: e }); 
     }
-}
+};
 
 async function updateGrocery(req, res) {
     try{
@@ -35,7 +35,7 @@ async function updateGrocery(req, res) {
     } catch (e) {
         res.status(500).json({ message: e.message, error: e }); 
     }
-}
+};
 
 async function deleteGrocery(req, res) {
     try{
@@ -46,11 +46,49 @@ async function deleteGrocery(req, res) {
     } catch (e) {
         res.status(500).json({ message: e.message, error: e });  
     }
-}
+};
+
+async function sortGroceryByPurchased(req, res) {
+    try{
+        //initialize the req.query for cleaner code
+        let isPurchased = req.query.isPurchased;
+        let isPurchasedOrder = isPurchased === "true" ? true : false;
+        let sortByDate = req.query.sort ? req.query.sort : null;
+
+        let finalSort;
+
+        if(!sortByDate) {
+            finalSort = null;
+        } else {
+            finalSort = sortByDate === "asc" ? 1 : -1;
+        }
+
+        let foundGrocery = await Grocery.find({ isPurchased: isPurchasedOrder}).sort({dateAdded: finalSort});
+
+        res.json({ payload: foundGrocery});
+
+    } catch (e) {
+        res.status(500).json({ message: e.message, error: e });
+    }
+};
+
+async function sortGroceryByDate(req, res) {
+    try {
+        let sort = req.query.sort;
+        let sortOrder = sort === "desc" ? -1 : 1;
+        let foundGrocery = await Grocery.find({}).sort({dateAdded: sortOrder });
+
+        res.json({ payload: foundGrocery });
+    } catch (e) {
+        console.log(e);
+    }
+};
 
 module.exports = {
     getAllGroceries,
     createGrocery,
     updateGrocery,
     deleteGrocery,
+    sortGroceryByPurchased,
+    sortGroceryByDate
 }
